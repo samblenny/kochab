@@ -97,20 +97,6 @@ tools from Debian and Canonical than in tools from the NPM ecosystem.
    node -v
    ```
 
-3. Install Typescript in project repo on Debian:
-   ```
-   # make sure .gitignore has a `node_modules/` line
-   yarn add typescript --dev
-   ```
-   To run the compiler:
-   ```
-   yarn tsc
-   ```
-   To see tsc options:
-   ```
-   yarn tsc --help
-   ```
-
 To see CLI tools installed with the snap, look in `/snap/node/current/bin`:
 ```
 $ ls -glo --time-style=+ /snap/node/current/bin
@@ -137,6 +123,56 @@ To do apt and snap updates on the Debian, run:
 ```
 sudo apt update && sudo apt upgrade && sudo snap refresh
 ```
+
+
+## Configure Yarn and install Typescript
+
+Yarn can be configured to use a package cache to enable offline workflows and
+generally speed things up by reducing network requests.
+
+Reference links:
+- https://classic.yarnpkg.com/blog/2016/11/24/offline-mirror/
+- https://yarnpkg.com/features/offline-cache
+
+1. Configure yarn offline mirror on Debian (this is one-time, not per-project):
+   ```
+   yarn config set yarn-offline-mirror ./.yarn-offline-cache
+   yarn config set yarn-offline-mirror-pruning true
+   # check what yarn config did:
+   less ~/.yarnrc
+   ```
+   This makes config changes in `~/.yarnrc` so that it becomes possible to use
+   `yarn install --prefer-offline` and `yarn install --offline`. I've seen
+   references to setting `install.prefer-offline true` with `yarn config`, but
+   that does not seem to work (as verified with `yarn install --verbose`).
+
+2. Add Typescript to project repo on Debian (when starting new project):
+   ```
+   # make sure .gitignore has a `node_modules/` line
+   yarn add typescript --dev
+   ```
+   Alternately, it might work to do a one-time global install sorta like this:
+   ```
+   yarn global install typescript --dev
+   ```
+   I have not tested this. Would probably need to add a `$PATH` entry with the
+   result of `yarn global bin` in order for it to work. For more info, see
+   https://classic.yarnpkg.com/en/docs/cli/global
+
+3. Alternately, to install Typescript in project when checking out an existing
+   repo:
+   ```
+   yarn install --prefer-offline
+   ```
+
+4. To run the compiler:
+   ```
+   yarn tsc
+   ```
+   To see tsc options:
+   ```
+   yarn tsc --help
+   ```
 
 
 ## Configuring API keys in Vercel
