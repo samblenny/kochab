@@ -54,7 +54,7 @@ How this works:
    like so:
    ```
    #!/bin/sh
-   rsync -rpt 'me@debian:the-repo/*' ~/github/the-repo
+   rsync -rpt --filter="- node_modules" 'me@debian:kochab/*' ~/code/kochab
    ```
    Once changes are pushed to GitHub, the Debian box can pull them with:
    ```
@@ -90,11 +90,25 @@ tools from Debian and Canonical than in tools from the NPM ecosystem.
    # wait... this may appear stuck for a few minutes, but be patient
    ```
 
-2. Install Node:
+2. Install Node on Debian:
    ```
    snap info node
    sudo snap install --classic node
    node -v
+   ```
+
+3. Install Typescript in project repo on Debian:
+   ```
+   # make sure .gitignore has a `node_modules/` line
+   yarn add typescript --dev
+   ```
+   To run the compiler:
+   ```
+   yarn tsc
+   ```
+   To see tsc options:
+   ```
+   yarn tsc --help
    ```
 
 To see CLI tools installed with the snap, look in `/snap/node/current/bin`:
