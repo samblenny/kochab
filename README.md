@@ -11,9 +11,9 @@ file and serverless function features of Vercel.
 
 To use it:
 
-1. In initial setup: clone repo and run `yarn install`
+1. Initial setup: clone repo and run `yarn install`
 
-2. `yarn build`  (compile `src/server.ts` and `api/*.ts` to .js in build/)
+2. `yarn build`  (compile `src/server.ts` and `api/*.ts` to js in `build/`)
 
 3. `yarn start`  (run HTTP server on port 8000 of all interfaces)
 
