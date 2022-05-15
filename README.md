@@ -4,6 +4,20 @@ A web app experiment using Vercel serverless functions for deployment and
 Node.js on Debian for local development.
 
 
+## Running the local dev server
+
+The `src/server.ts` module provides a local dev approximation of the static
+file and serverless function features of Vercel.
+
+To use it:
+
+1. In initial setup: clone repo and run `yarn install`
+
+2. `yarn build`  (compile `src/server.ts` and `api/*.ts` to .js in build/)
+
+3. `yarn start`  (run HTTP server on port 8000 of all interfaces)
+
+
 ## Workflow to edit, test, and deploy
 
 This procedure was developed and tested for a primary dev workstation running
@@ -175,6 +189,17 @@ Reference links:
    ```
 
 
+## Getting Typescript imports working for Node builtins
+
+Typescript imports require type declarations. By default, Typescript includes
+types packages that it finds in `node_modules/@types/`. So, to import from
+node, we need `node_modules/@types/node/` to contain type declarations for
+Node's built-in types. The easy way to get those is:
+```
+yarn add --dev @types/node
+```
+
+
 ## Configuring API keys in Vercel
 
 
@@ -209,7 +234,7 @@ For Debian, there are plenty of options. For example:
    script on the Mac like this:
    ```
    #!/bin/sh
-   ssh me@debian 'NASA_API_KEY=...; cd ~/kochab; /snap/bin/node dev-app.mjs'
+   ssh me@debian 'NASA_API_KEY=...; cd ~/kochab; yarn start'
    ```
    Then, run that script from the Mac to start the web app in Node on Debian.
    Note that this may leave node running on the Debian box even after you end

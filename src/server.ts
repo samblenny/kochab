@@ -2,20 +2,28 @@
 //
 // This is a primitive approximation of Vercel's hosting, meant for local dev.
 //
-import { createServer } from 'node:http';
-import { readFile } from 'node:fs';
+import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { join, normalize, posix } from 'node:path';
+import { readFile } from 'node:fs';
 
 // Root directory for static files
 const root = 'public';
 
-// List of route rewrite transformations for static files
-const rewrites = {
+const rewrites: Record<string, string> = {
     '/': 'index.html',
 };
 
+// Root directory for compiled api serverless function modules
+const apiRoot = '../api';
+
+const api404 = `${apiRoot}/404.js`;
+
+const apiRewrites: Record<string, string> = {
+    '/api/hello': `${apiRoot}/hello.js`
+}
+
 // Resolve filename to MIME type according to file extensions
-function mimeType(file) {
+function mimeType(file: string): string {
     const ext = posix.extname(file);
     if(ext === '.html') { return 'text/html;charset=UTF-8'; }
     if(ext === '.css')  { return 'text/css;charset=UTF-8'; }
@@ -24,7 +32,7 @@ function mimeType(file) {
 }
 
 // Serve 404 page for http.ServerResponse
-function serve404(res) {
+function serve404(res: ServerResponse) {
     const file = "404.html";
     const filePath = join(root, normalize(file));
     res.statusCode = 404;
@@ -41,7 +49,7 @@ function serve404(res) {
 }
 
 // Serve http.ServerResponse, with given status, from a static file
-function serveFile(res, status, file) {
+function serveFile(res: ServerResponse, status: number, file: string) {
     res.setHeader('Content-Type', mimeType(file));
     const filePath = join(root, normalize(file));
     readFile(filePath, function (err, data) {
@@ -55,24 +63,44 @@ function serveFile(res, status, file) {
 }
 
 // Serve JSON 404 for http.ServerResponse to an api endpoint
-function serveApi404(res) {
+function serveApi404(res: ServerResponse) {
     res.setHeader('Content-Type', 'application/json');
     res.statusCode = 404;
     res.end('{ "status": 404 }');
 }
 
-// Serve http.ServerResponse for an api endpoint
-function routeApiRequest(req, res, normUrl) {
-    serveApi404(res);
+// Serve http.ServerResponse for api serverless function endpoints
+function routeApiRequest(req: IncomingMessage, res: ServerResponse) {
+    const key = req.url || '';
+    if(apiRewrites.hasOwnProperty(key)) {
+        const apiModule = apiRewrites[key];
+        import(apiModule)
+            .then(module => {
+                module.default(req, res);  // Normal serverless function
+            })
+            .catch(err => {
+                console.log(err);
+                serveApi404(res);          // Fallback api 404
+            });
+    } else {
+        import(api404)
+            .then(module => {
+                module.default(req, res);  // Normal custom api 404
+            })
+            .catch(err => {
+                console.log(err);
+                serveApi404(res);          // Fallback api 404
+            });
+    }
 }
 
 // Server for responding to HTTP requests
-const server = createServer((req, res) => {
-    const normUrl = posix.normalize(decodeURI(req.url));
+const server = createServer((req: IncomingMessage, res) => {
+    const normUrl = posix.normalize(decodeURI(req.url || '/'));
     const normDir = posix.dirname(normUrl);
     const normBase = posix.basename(normUrl);
     if(normUrl.startsWith('/api/')) {
-        routeApiRequest(req, res, normUrl);
+        routeApiRequest(req, res);
     } else if(/^[._]/.test(normDir) || normBase.startsWith('_')) {
         // Directories starting with '.' or '_' are not allowed.
         // Files starting with '_' are not allowed.
@@ -87,6 +115,6 @@ const server = createServer((req, res) => {
 });
 
 // Start server listening on all iterfaces
-server.listen('8000', '0.0.0.0', () => {
+server.listen(8000, '0.0.0.0', () => {
   console.log('Listening HTTP port 8000 on all interfaces (CAUTION!)');
 });
