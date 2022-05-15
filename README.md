@@ -4,6 +4,20 @@ A web app experiment using Vercel serverless functions for deployment and
 Node.js on Debian for local development.
 
 
+## Running the local dev server
+
+The `src/server.ts` module provides a local dev approximation of the static
+file and serverless function features of Vercel.
+
+To use it:
+
+1. In initial setup: clone repo and run `yarn install`
+
+2. `yarn build`  (compile `src/server.ts` and `api/*.ts` to .js in build/)
+
+3. `yarn start`  (run HTTP server on port 8000 of all interfaces)
+
+
 ## Workflow to edit, test, and deploy
 
 This procedure was developed and tested for a primary dev workstation running
@@ -54,7 +68,7 @@ How this works:
    like so:
    ```
    #!/bin/sh
-   rsync -rpt 'me@debian:the-repo/*' ~/github/the-repo
+   rsync -rpt --filter="- node_modules" 'me@debian:kochab/*' ~/code/kochab
    ```
    Once changes are pushed to GitHub, the Debian box can pull them with:
    ```
@@ -90,7 +104,7 @@ tools from Debian and Canonical than in tools from the NPM ecosystem.
    # wait... this may appear stuck for a few minutes, but be patient
    ```
 
-2. Install Node:
+2. Install Node on Debian:
    ```
    snap info node
    sudo snap install --classic node
@@ -122,6 +136,67 @@ find | less
 To do apt and snap updates on the Debian, run:
 ```
 sudo apt update && sudo apt upgrade && sudo snap refresh
+```
+
+
+## Configure Yarn and install Typescript
+
+Yarn can be configured to use a package cache to enable offline workflows and
+generally speed things up by reducing network requests.
+
+Reference links:
+- https://classic.yarnpkg.com/blog/2016/11/24/offline-mirror/
+- https://yarnpkg.com/features/offline-cache
+
+1. Configure yarn offline mirror on Debian (this is one-time, not per-project):
+   ```
+   yarn config set yarn-offline-mirror ./.yarn-offline-cache
+   yarn config set yarn-offline-mirror-pruning true
+   # check what yarn config did:
+   less ~/.yarnrc
+   ```
+   This makes config changes in `~/.yarnrc` so that it becomes possible to use
+   `yarn install --prefer-offline` and `yarn install --offline`. I've seen
+   references to setting `install.prefer-offline true` with `yarn config`, but
+   that does not seem to work (as verified with `yarn install --verbose`).
+
+2. Add Typescript to project repo on Debian (when starting new project):
+   ```
+   # make sure .gitignore has a `node_modules/` line
+   yarn add typescript --dev
+   ```
+   Alternately, it might work to do a one-time global install sorta like this:
+   ```
+   yarn global install typescript --dev
+   ```
+   I have not tested this. Would probably need to add a `$PATH` entry with the
+   result of `yarn global bin` in order for it to work. For more info, see
+   https://classic.yarnpkg.com/en/docs/cli/global
+
+3. Alternately, to install Typescript in project when checking out an existing
+   repo:
+   ```
+   yarn install --prefer-offline
+   ```
+
+4. To run the compiler:
+   ```
+   yarn tsc
+   ```
+   To see tsc options:
+   ```
+   yarn tsc --help
+   ```
+
+
+## Getting Typescript imports working for Node builtins
+
+Typescript imports require type declarations. By default, Typescript includes
+types packages that it finds in `node_modules/@types/`. So, to import from
+node, we need `node_modules/@types/node/` to contain type declarations for
+Node's built-in types. The easy way to get those is:
+```
+yarn add --dev @types/node
 ```
 
 
@@ -159,7 +234,7 @@ For Debian, there are plenty of options. For example:
    script on the Mac like this:
    ```
    #!/bin/sh
-   ssh me@debian 'NASA_API_KEY=...; cd ~/kochab; /snap/bin/node dev-app.mjs'
+   ssh me@debian 'NASA_API_KEY=...; cd ~/kochab; yarn start'
    ```
    Then, run that script from the Mac to start the web app in Node on Debian.
    Note that this may leave node running on the Debian box even after you end
