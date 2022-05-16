@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<!-- Copyright (c) 2022 Sam Blenny -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="NASA APOD - Kochab">
+<title>NASA APOD - Kochab</title>
+<link rel="preload" href="style.css" as="style">
+<link href="style.css" rel="stylesheet"></head><body>
+<header><a href="/">Kochab</a></header>
+<main>
+
+<h1>NASA Astronomy Picture of the Day</h1>
+<style>
+#apod figure{max-width:75%;padding:0;margin:15px auto;}
+#apod img{max-width:100%;padding:0;margin:10px auto;}
+</style>
+<div id="apod"><figure><figcaption>Loading...</figcaption></figure></div>
+
+</main><footer>Copyright (c) 2022 Sam Blenny</footer>
+
+<script>
+const target = document.getElementById('apod');
+function oops(err) {
+    console.log(err);
+    target.innerHTML = "hmm... that didn't work";
+}
+// Attempt to inject html fragment from Kochab API, which uses the NASA API
+fetch('/api/nasa-apod')
+.then((response) => {
+    response.text()
+        .then((html) => { target.innerHTML = html; })
+        .catch(oops);
+})
+.catch(oops);
+</script>
+
+</body></html>

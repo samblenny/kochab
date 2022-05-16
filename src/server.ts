@@ -19,7 +19,8 @@ const apiRoot = '../api';
 const api404 = `${apiRoot}/404.js`;
 
 const apiRewrites: Record<string, string> = {
-    '/api/hello': `${apiRoot}/hello.js`
+    '/api/hello': `${apiRoot}/hello.js`,
+    '/api/nasa-apod': `${apiRoot}/nasa-apod.js`
 }
 
 // Resolve filename to MIME type according to file extensions

@@ -18,6 +18,52 @@ To use it:
 3. `yarn start`  (run HTTP server on port 8000 of all interfaces)
 
 
+## Configuring API keys in Vercel
+
+
+### NASA_API_KEY Environment Variable
+
+1. Get API key from https://api.nasa.gov/index.html
+
+2. Log into Vercel and select the project for this repo
+
+3. In the Vercel control panel, on the tab selector line near the top left
+   (look for "Overview  Deployments  Analytics Settings"), pick "Settings".
+
+4. On the left sidebar, select "Environment Variables".
+
+5. In the main content area, in the "Add New" form, fill in:
+   - NAME: NASA_API_KEY
+   - VALUE: your-actual-api-key
+   - ENVIRONMENT: leave the boxes for "Production" and "Preview" checked, but
+     uncheck the box for "Development"
+
+6. Click the "Add" button.
+
+That takes care of the API key for the deployed web app, but we still need to
+provide for setting up the environment variable for local dev on Debian.
+There are plenty of options.
+
+An easy way is to add `export NASA_API_KEY=...` to `~/.profile`, `~/.bashrc`,
+or wherever you normally define environgment variables.
+
+
+### KOCHAB_API_FENCE Environment Variable
+
+Use the same procedure as above to set `KOCHAB_API_FENCE=1` for local dev.
+
+Or, to deploy on Vercel, set `KOCHAB_API_FENCE` to a number that is less than
+or equal to the value of `apiFence` in [/api/_kochab.ts](/api/_kochab.ts).
+
+This motivation for this is to have a kill switch feature to disable API key
+usage by the preview sites for old code versions that hang around on Vercel
+indefinitely, if I'm read their docs right. If you increase `apiFence` in the
+code, deploy that, then increase `KOCHAB_API_FENCE` in the Vercel dashboard, it
+should have the effect of disabling API key use by old preview versions of the
+site. This won't really matter unless that stuff is getting hit by crawlers.
+But, in that case, it may protect against taking pointless API quota damage.
+
+
 ## Workflow to edit, test, and deploy
 
 This procedure was developed and tested for a primary dev workstation running
@@ -111,27 +157,9 @@ tools from Debian and Canonical than in tools from the NPM ecosystem.
    node -v
    ```
 
-To see CLI tools installed with the snap, look in `/snap/node/current/bin`:
-```
-$ ls -glo --time-style=+ /snap/node/current/bin
-total 85438
-lrwxrwxrwx 1       45  corepack -> ../lib/node_modules/corepack/dist/corepack.js
--rwxr-xr-x 1 87483808  node
-lrwxrwxrwx 1       38  npm -> ../lib/node_modules/npm/bin/npm-cli.js
-lrwxrwxrwx 1       38  npx -> ../lib/node_modules/npm/bin/npx-cli.js
--rwxr-xr-x 1     1025  yarn
--rwxr-xr-x 1       34  yarn.cmd
--rwxr-xr-x 1     1015  yarn.js
--rwxr-xr-x 1       42  yarnpkg
--rwxr-xr-x 1       30  yarnpkg.cmd
-```
+To see CLI tools installed with node, check `/snap/node/current/bin`.
 
-To see modules installed with the snap, look in `/snap/node/current/lib`:
-```
-cd /snap/node/current/lib/node_modules/npm/node_modules
-less builtins/builtins.json
-find | less
-```
+To see modules installed with node, check `/snap/node/current/lib`.
 
 To do apt and snap updates on the Debian, run:
 ```
@@ -198,44 +226,3 @@ Node's built-in types. The easy way to get those is:
 ```
 yarn add --dev @types/node
 ```
-
-
-## Configuring API keys in Vercel
-
-
-### NASA API key
-
-1. Get API key from https://api.nasa.gov/index.html
-
-2. Log into Vercel and select the project for this repo
-
-3. In the Vercel control panel, on the tab selector line near the top left
-   (look for "Overview  Deployments  Analytics Settings"), pick "Settings".
-
-4. On the left sidebar, select "Environment Variables".
-
-5. In the main content area, in the "Add New" form, fill in:
-   - NAME: NASA_API_KEY
-   - VALUE: your-actual-api-key
-   - ENVIRONMENT: leave the boxes for "Production" and "Preview" checked, but
-     uncheck the box for "Development"
-
-6. Click the "Add" button.
-
-That takes care of the API key for the deployed web app, but we still need to
-provide for setting up the environment variable for local dev on the Debian.
-For Debian, there are plenty of options. For example:
-
-1. Lazy way: add `EXPORT NASA_API_KEY=...` to `~/.profile`, preferably using an
-   API key that is not the production key
-
-2. Paranoid way: (makes it moderately more difficult for the API key to be
-   exfiltrated from the Debian box since it's not saved in `.profile`). Make a
-   script on the Mac like this:
-   ```
-   #!/bin/sh
-   ssh me@debian 'NASA_API_KEY=...; cd ~/kochab; yarn start'
-   ```
-   Then, run that script from the Mac to start the web app in Node on Debian.
-   Note that this may leave node running on the Debian box even after you end
-   the SSH session with control-c. Not sure yet how to prevent that.

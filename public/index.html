@@ -1,19 +1,42 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-<!--
-Copyright (c) 2022 Sam Blenny
--->
+<!-- Copyright (c) 2022 Sam Blenny -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Kochab - a web app experiment">
+<meta name="description" content="Kochab">
 <title>Kochab</title><link rel="preload" href="style.css" as="style">
 <link href="style.css" rel="stylesheet"></head><body>
 <header><a href="/">Kochab</a></header>
 <main>
 
-<p>API endpoints:</p>
+<h2>Demo Pages</h2>
 <ul>
- <li><a href="/api/hello">/api/hello</a></li>
+<li><a href="/nasa-apod.html">/nasa-apod.html</a> &mdash; Shows an image and
+ caption for NASA's Astronomy Picture of the Day from the NASA API. This uses a
+ serverless function to request JSON from NASA and transform it into an HTML
+ fragment.</li>
 </ul>
 
-</main><footer>
-Copyright (c) 2022 Sam Blenny
-</footer></body></html>
+<h2>Demo API Endpoints</h2>
+<ul>
+<li><a href="/api/hello">/api/hello</a> &mdash; Simple serverless function to
+ demonstrate the site is working. This does not rely on accessing any third
+ party APIs. The content-type is application/json.</li>
+<li><a href="/api/nasa-apod">/api/nasa-apod</a> &mdash; This requests JSON from
+ NASA's API, filters the JSON, then transforms it into an html fragment. It's a
+ little silly to do this server-side, but the point was to experiment with the
+ plumbing for handling API keys and transforming data from a third party API.
+ The API key comes from an environment variable, configured either through the
+ dashboard in Vercel, or manually for local dev. The content type is
+ text/html.</li>
+</ul>
+
+<h2>Environment Variables</h2>
+
+<p>To run this locally, the dev server needs two environment variables to be
+set in order to work properly with third party APIs. For more information,
+refer to the README in the
+<a href="https://github.com/samblenny/kochab">samblenny/kochab</a>
+repository on GitHub.</p>
+
+</main>
+<footer>Copyright (c) 2022 Sam Blenny</footer>
+</body></html>
