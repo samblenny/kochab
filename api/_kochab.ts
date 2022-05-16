@@ -1,12 +1,12 @@
 // Copyright (c) 2022 Sam Blenny
 //
-// This is a utility class for Kochab serverless api endpoints.
+// This is a utility module for Kochab serverless api endpoints.
 //
 
 import * as https from 'node:https';
 
 // This value gets compared to the KOCHAB_API_FENCE environment variable
-const apiFence = 1;
+const apiFence = 2;
 
 export interface JsonData {
     [key: string]: object;

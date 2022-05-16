@@ -15,6 +15,30 @@
 </style>
 <div id="apod"><figure><figcaption>Loading...</figcaption></figure></div>
 
+<h2>What is this?</h2>
+
+<p>You're looking at an image from NASA's Astronomy Picture of the Day API,
+brought to you by a winding path involving a Typescript serverless function
+hosted on Vercel. This is not in any way affiliated with or endorsed by NASA.
+I'm just using their API. Photo credit should be included in the caption above,
+unless something broke.</p>
+
+<p>Links to code involved in serving this page:<p>
+<ul>
+<li><a href="https://github.com/samblenny/kochab/blob/main/public/nasa-apod.html">
+ github.com/samblenny/kochab/blob/main/public/nasa-apod.html</a> is the static
+ html for this page, not including the image and caption elements, which are
+ loaded separately by a script.</li>
+<li><a href="https://github.com/samblenny/kochab/blob/main/api/nasa-apod.ts">
+ github.com/samblenny/kochab/blob/main/api/nasa-apod.ts</a> is the serverless
+ function that fetches JSON data from the NASA API and transforms it into an
+ HTML fragment with the image and caption elements.</li>
+<li><a href="https://github.com/samblenny/kochab/blob/main/api/_kochab.ts">
+ github.com/samblenny/kochab/blob/main/api/_kochab.ts</a> is a utility module
+ that provides helper functions for working with environment variable API keys
+ and using the node:https module to do HTTP GET requests with Promises.</li>
+</ul>
+
 </main><footer>Copyright (c) 2022 Sam Blenny</footer>
 
 <script>
