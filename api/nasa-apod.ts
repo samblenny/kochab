@@ -18,7 +18,7 @@ export default (req: IncomingMessage, res: ServerResponse) => {
     getJson(url)
         .then((data: JsonData) => {
             res.statusCode = 200;
-            res.setHeader('Cache-Control', 's-maxage=3600'); // 1 hour
+            res.setHeader('Cache-Control', 's-maxage=300'); // 5 minutes
             const shortData = filterApodJson(data);
             const html = formatApod(shortData);
             res.end(html);
