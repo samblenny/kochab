@@ -3,24 +3,18 @@
 // - VercelResponse is node:http.ServerResponse plus some helper functions
 // - see https://github.com/vercel/vercel/blob/main/packages/node/src/types.ts
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { apiAccessAllowed, getJson, getNasaKey, JsonData } from "./_kochab";
+import { getJson, getNasaKey, JsonData } from "./_kochab";
 
 // Return json with a link to NASA's Astronomy Picture Of the Day
 export default (req: IncomingMessage, res: ServerResponse) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    if(!apiAccessAllowed()) {
-        res.statusCode = 500;
-        res.end('500 api access not allowed (check KOCHAB_API_FENCE env var)');
-        return;
-    }
     const key = getNasaKey();
     const url = `https://api.nasa.gov/planetary/apod?api_key=${key}`;
     getJson(url)
         .then((data: JsonData) => {
             res.statusCode = 200;
             res.setHeader('Cache-Control', 's-maxage=300'); // 5 minutes
-            const shortData = filterApodJson(data);
-            const html = formatApod(shortData);
+            const html = formatApod(data);
             res.end(html);
         })
         .catch((err) => {
@@ -29,17 +23,6 @@ export default (req: IncomingMessage, res: ServerResponse) => {
             res.end('500 NASA api error');
         });
 };
-
-// Remove the long description and other non-interesting keys
-function filterApodJson(data: JsonData): JsonData {
-    const filter = ['explanation', 'hdurl', 'media_type', 'service_version'];
-    for(const k of filter) {
-        if(data.hasOwnProperty(k)) {
-            delete data[k];
-        }
-    }
-    return data;
-}
 
 // Format APOD json as an html fragment
 function formatApod(data: JsonData): string {
@@ -51,12 +34,13 @@ function formatApod(data: JsonData): string {
         }
     }
     if(missing) {
+        console.log("NASA json format error:", data);
         return "\n<div class='kochabErr'>Loading NASA APOD json failed</div>";
     }
-    let html = "\n<figure class='kochabApod'>\n";
-    html += `<img src="${data.url}" alt="${data.title}">`;
-    html += `<figcaption>${data.title}<br>${data.copyright}<br>\n`;
-    html += `NASA Astronomy Picture of the Day ${data.date}</figcaption>\n`;
-    html += "\n</figure>\n";
+    let html = "<figure class='kochabApod'>\n";
+    html += `<img src="${data.url}" alt="${data.title}">\n`;
+    html += `<figcaption>${data.title}<br>\n${data.copyright}<br>\n`;
+    html += `NASA Astronomy Picture of the Day ${data.date}\n</figcaption>\n`;
+    html += "</figure>\n";
     return html;
 }

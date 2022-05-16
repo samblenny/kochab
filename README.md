@@ -18,10 +18,12 @@ To use it:
 3. `yarn start`  (run HTTP server on port 8000 of all interfaces)
 
 
-## Configuring API keys in Vercel
+## Configuring API keys
 
 
 ### NASA_API_KEY Environment Variable
+
+To configure the NASA API key in Vercel:
 
 1. Get API key from https://api.nasa.gov/index.html
 
@@ -45,23 +47,25 @@ provide for setting up the environment variable for local dev on Debian.
 There are plenty of options.
 
 An easy way is to add `export NASA_API_KEY=...` to `~/.profile`, `~/.bashrc`,
-or wherever you normally define environgment variables.
+or wherever you normally define environment variables.
 
 
-### KOCHAB_API_FENCE Environment Variable
+### Concerning old deployments
 
-Use the same procedure as above to set `KOCHAB_API_FENCE=1` for local dev.
+Previews of old deployments hang around on Vercel unless you manually delete
+them. This means there are potential issues with old code -- which may be
+outdated, insecure, or otherwise troublesome -- using its API keys to access
+resources long after that code has seemingly been replaced by newer
+deployments.
 
-Or, to deploy on Vercel, set `KOCHAB_API_FENCE` to a number that is less than
-or equal to the value of `apiFence` in [/api/_kochab.ts](/api/_kochab.ts).
-
-This motivation for this is to have a kill switch feature to disable API key
-usage by the preview sites for old code versions that hang around on Vercel
-indefinitely, if I'm read their docs right. If you increase `apiFence` in the
-code, deploy that, then increase `KOCHAB_API_FENCE` in the Vercel dashboard, it
-should have the effect of disabling API key use by old preview versions of the
-site. This won't really matter unless that stuff is getting hit by crawlers.
-But, in that case, it may protect against taking pointless API quota damage.
+I originally though it might be possible to disable API access by old previews
+by changing an environment variable. But, it turns out I was wrong about that.
+According to https://vercel.com/docs/concepts/projects/environment-variables,
+the environment variables get baked into a deployment. Changes to environment
+variables only affect new deployments. So, unless you want to revoke and
+re-issue API keys frequently, the best way to prevent unintended API actions
+getting taken by old previews is probably to manually delete them in the Vercel
+dashboard.
 
 
 ## Workflow to edit, test, and deploy

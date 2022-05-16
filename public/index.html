@@ -21,19 +21,17 @@
  demonstrate the site is working. This does not rely on accessing any third
  party APIs. The content-type is application/json.</li>
 <li><a href="/api/nasa-apod">/api/nasa-apod</a> &mdash; This requests JSON from
- NASA's API, filters the JSON, then transforms it into an html fragment. It's a
- little silly to do this server-side, but the point was to experiment with the
- plumbing for handling API keys and transforming data from a third party API.
- The API key comes from an environment variable, configured either through the
- dashboard in Vercel, or manually for local dev. The content type is
- text/html.</li>
+ NASA's API, then transforms it into an html fragment. It's a little silly to
+ do this server-side, but the point was to experiment with the plumbing for
+ handling API keys and transforming data from a third party API. The API key
+ comes from an environment variable, configured either through the dashboard in
+ Vercel, or manually for local dev. The content type is text/html.</li>
 </ul>
 
 <h2>Environment Variables</h2>
 
-<p>To run this locally, the dev server needs two environment variables to be
-set in order to work properly with third party APIs. For more information,
-refer to the README in the
+<p>To run this locally, the dev server needs an environment variable to be
+set for the API key. For more information, refer to the README in the
 <a href="https://github.com/samblenny/kochab">samblenny/kochab</a>
 repository on GitHub.</p>
 
