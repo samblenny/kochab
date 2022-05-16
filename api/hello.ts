@@ -7,5 +7,6 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 export default (req: IncomingMessage, res: ServerResponse) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 's-maxage=300'); // 5 minutes
     res.end('{ "message": "Hello" }');
 };
