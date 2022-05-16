@@ -5,7 +5,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { getJson, getNasaKey, JsonData } from "./_kochab";
 
-// Return json with a link to NASA's Astronomy Picture Of the Day
+// Return html fragment for NASA's Astronomy Picture Of the Day
 export default (req: IncomingMessage, res: ServerResponse) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     const key = getNasaKey();
