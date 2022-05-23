@@ -28,19 +28,14 @@ export default (req: IncomingMessage, res: ServerResponse) => {
 function formatApod(data: JsonData): string {
     const keys = ['copyright', 'date', 'title', 'url'];
     let missing = false;
-    for(const k of keys) {
-        if(!data.hasOwnProperty(k)) {
-            missing = true;
-        }
-    }
-    if(missing) {
-        console.log("NASA json format error:", data);
-        return "\n<div class='kochabErr'>Loading NASA APOD json failed</div>";
-    }
+    const copyright = data.copyright || "[photographer not provided (Hubble?)]";
+    const date = data.date || "[date not provided]";
+    const title = data.title || "[title not provided]";
+    const url = data.url || "";
     let html = "<figure class='kochabApod'>\n";
-    html += `<img src="${data.url}" alt="${data.title}">\n`;
-    html += `<figcaption>${data.title}<br>\n${data.copyright}<br>\n`;
-    html += `NASA Astronomy Picture of the Day ${data.date}\n</figcaption>\n`;
+    html += `<img src="${url}" alt="${title}">\n`;
+    html += `<figcaption>${title}<br>\n${copyright}<br>\n`;
+    html += `NASA Astronomy Picture of the Day ${date}\n</figcaption>\n`;
     html += "</figure>\n";
     return html;
 }
